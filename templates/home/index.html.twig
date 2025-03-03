@@ -1,0 +1,749 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}RuleSet generator for mosparo{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <!-- Header -->
+    <header class="mb-5 text-center">
+        <h1>RuleSet Generator</h1>
+        <p class="text-muted">Generate ruleset for mosparo with just some click and typing.</p>
+    </header>
+
+    <!-- Step 1: Choose Option -->
+    <div id="step1" class="card mb-4 rounded shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5>Step 1: Choose an Option</h5>
+        </div>
+        <div class="card-body justify">
+            <div class="d-flex justify-content-between">
+                <button type="button" id="createNewBtn" class="btn btn-primary me-3">Create New JSON File</button>
+                <button type="button" id="uploadExistingBtn" class="btn btn-secondary">Upload Existing JSON
+                    File</button>
+            </div>
+
+            <!-- Upload JSON File -->
+            <div id="fileInputWrapper" class="mt-4 d-none">
+                <label for="jsonFileInputStep1" class="form-label">Choose JSON file</label>
+                <input type="file" class="form-control form-control-sm" id="jsonFileInputStep1"
+                    name="jsonFileInputStep1" accept=".json">
+                <!-- Validation Messages -->
+                <div id="validationMessages" class="mt-3 d-none"></div>
+
+                <div class="d-flex justify-content-center"><button id="step1NextBtn"
+                        class="btn btn-primary mt-4">Next</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial Card for Step 1 -->
+    <div id="tutorialStep1" class="card mb-4 rounded shadow-sm cardtut">
+        <div class="card-header bg-dark text-white">
+            <h5>Tutorial: Step 1</h5>
+        </div>
+        <div class="card-body">
+            <p>Choose whether you want to create a new JSON file or upload an existing one.</p>
+            <ul>
+                <li><strong>Create New JSON File:</strong> Click this button if you want to start from scratch and
+                    create a new ruleset.</li>
+                <li><strong>Upload Existing JSON File:</strong> Click this button if you already have a JSON file with
+                    existing rulesets and want to modify or extend it.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Step 2: Settings Card -->
+    <div id="step2" class="card mb-4 rounded shadow-sm d-none">
+        <div class="card-header bg-dark text-white">
+            <h5>Step 2: Settings</h5>
+        </div>
+        <div class="card-body">
+            <form id="settingsForm" enctype="multipart/form-data">
+                <input type="hidden" name="csrf-token" id="csrf-token"
+                    value="{{ csrf_token(get_env('APP_CSRF_KEY_GENERATE')) }}">
+
+                <!-- Rule Selection Dropdown -->
+                <div id="ruleSelectionWrapper" class="mt-3 d-none">
+                    <label for="selectedRuleType" class="form-label">Select Rule Type</label>
+                    <select class="form-select" id="selectedRuleType" name="selectedRuleType">
+                        <option selected disabled>Select rule type...</option>
+                    </select>
+                </div>
+
+                <div class="row g-3 mt-3">
+                    <!-- First Row -->
+                    <div class="col-md-4">
+                        <label for="ruleName" class="form-label">Rule Name</label>
+                        <input type="text" class="form-control" id="ruleName" name="ruleName"
+                            placeholder="Enter rule name">
+                    </div>
+
+                    <div class="col-md-8">
+                        <label for="description" class="form-label">Rule Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"
+                            placeholder="Enter description"></textarea>
+                    </div>
+
+                    <!-- Second Row -->
+                    <div class="col-md-4">
+                        <label for="ruleType" class="form-label">Rule Type</label>
+                        <select class="form-select" id="ruleType" name="ruleType">
+                            <option selected disabled>Select type...</option>
+                            <option value="domain">Domain</option>
+                            <option value="email">Email</option>
+                            <option value="ipAddress">IP Address</option>
+                            <option value="provider">Provider</option>
+                            <option value="unicodeBlock">Unicode block</option>
+                            <option value="user-agent">User agent</option>
+                            <option value="website">Website</option>
+                            <option value="word">Word</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="spamRating" class="form-label">Rule Default Spam Rating</label>
+                        <input type="number" class="form-control" id="spamRating" name="spamRating" placeholder="0.0"
+                            title="Enter a number with one decimal place, e.g., 1.0">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="fileName" class="form-label">Export File Name</label>
+                        <input type="text" class="form-control" id="fileName" name="fileName"
+                            placeholder="Enter file name">
+                    </div>
+
+                    <div class="col-md-12 mt-3">
+                        <label for="fileInput" class="form-label">Choose txt file</label>
+                        <input type="file" class="form-control form-control-sm" id="fileInput" name="fileInput"
+                            accept=".txt">
+                    </div>
+                    <!-- General Log Limit -->
+                    <div class="col-md-3 mt-3">
+                        <label for="logLimit" class="form-label">General Log Limit</label>
+                        <input type="number" class="form-control" id="general_logLimit" name="general_logLimit"
+                            value="15" placeholder="Enter log limit">
+                        <div class="form-check mt-1 d-flex justify-content-center">
+                            <input class="form-check-input" type="checkbox" id="general_unlimited"
+                                onclick="toggleInput(this, 'general_logLimit')">
+                            <label class="form-check-label ms-2" for="general_unlimited">Unlimited</label>
+                        </div>
+                    </div>
+
+                    <!-- Error Log Limit -->
+                    <div class="col-md-3 mt-3">
+                        <label for="logLimit" class="form-label">Error Log Limit</label>
+                        <input type="number" class="form-control" id="error_logLimit" name="error_logLimit" value="15"
+                            placeholder="Enter log limit">
+                        <div class="form-check mt-1 d-flex justify-content-center">
+                            <input class="form-check-input" type="checkbox" id="error_unlimited"
+                                onclick="toggleInput(this, 'error_logLimit')">
+                            <label class="form-check-label ms-2" for="error_unlimited">Unlimited</label>
+                        </div>
+                    </div>
+
+                    <!-- Skipped Log Limit -->
+                    <div class="col-md-3 mt-3">
+                        <label for="logLimit" class="form-label">Skipped Log Limit</label>
+                        <input type="number" class="form-control" id="skipped_logLimit" name="skipped_logLimit"
+                            value="15" placeholder="Enter log limit">
+                        <div class="form-check mt-1 d-flex justify-content-center">
+                            <input class="form-check-input" type="checkbox" id="skipped_unlimited"
+                                onclick="toggleInput(this, 'skipped_logLimit')">
+                            <label class="form-check-label ms-2" for="skipped_unlimited">Unlimited</label>
+                        </div>
+                    </div>
+
+                    <!-- Updated Log Limit -->
+                    <div class="col-md-3 mt-3">
+                        <label for="logLimit" class="form-label">Updated Log Limit</label>
+                        <input type="number" class="form-control" id="updated_logLimit" name="updated_logLimit"
+                            value="15" placeholder="Enter log limit">
+                        <div class="form-check mt-1 d-flex justify-content-center">
+                            <input class="form-check-input" type="checkbox" id="updated_unlimited"
+                                onclick="toggleInput(this, 'updated_logLimit')">
+                           <label class="form-check-label ms-2" for="updated_unlimited">Unlimited</label>
+                        </div>
+                    </div>
+                </div>
+                <div id="validationMessages2" class="mt-3 d-none"></div>
+            </form>
+            <div class="d-flex justify-content-between">
+                <button id="step2BackBtn" class="btn btn-secondary mt-4">Back</button>
+                <button id="step2NextBtn" class="btn btn-primary mt-4">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial Card for Step 2 -->
+    <div id="tutorialStep2" class="card mb-4 rounded shadow-sm d-none cardtut">
+        <div class="card-header bg-dark text-white">
+            <h5>Tutorial: Step 2</h5>
+        </div>
+        <div class="card-body">
+            <p>Configure the settings for your ruleset.</p>
+            <ul>
+                <li><strong>Select Rule Type:</strong> If you uploaded a JSON file with multiple rules, select the rule
+                    type you want to modify or extend.</li>
+                <li><strong>Rule Name:</strong> Enter a name for your rule.</li>
+                <li><strong>Rule Description:</strong> Provide a description for your rule.</li>
+                <li><strong>Rule Type:</strong> Choose the type of rule (Email, IP Address, Block List, Word Filter).
+                </li>
+                <li><strong>Rule Default Spam Rating:</strong> Set the default spam rating factor for this rule.</li>
+                <li><strong>Export File Name:</strong> Enter a name for the exported JSON file.</li>
+                <li><strong>General Log Limit:</strong> You can set a value here for the number of logs you want to see, or choose to have unlimited logs, in the next step within the 'General Console' section.</li>
+                <li><strong>Error Log Limit:</strong> You can set a value here for the number of logs you want to see, or choose to have unlimited logs, in the next step within the 'Error Console' section.</li>
+                <li><strong>Skipped Log Limit:</strong> You can set a value here for the number of logs you want to see, or choose to have unlimited logs, in the next step within the 'Skipped Entries' section.</li>
+                <li><strong>Updated Log Limit:</strong> You can set a value here for the number of logs you want to see, or choose to have unlimited logs, in the next step within the 'Updated Entries' section.</li>
+            </ul>
+        </div>
+    </div>
+
+
+
+    <!-- Step 3: Progress Section -->
+    <div id="step3" class="card mb-4 p-3 rounded shadow-sm d-none">
+        <div class="progress mb-3" style="height: 25px;">
+            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                0%
+            </div>
+        </div>
+        <div class="text-center text-muted small d-none" id="statusText">Processing...</div>
+    </div>
+
+    <!-- Console Section -->
+    <section class="console-section d-none mb-5" id="consoleSection">
+        <h5 class="mb-4">System Logs</h5>
+        <div class="row g-4">
+
+            <!-- General Console -->
+            <div class="col-md-6 col-xl-3">
+                <div class="card border rounded shadow-sm text-white">
+                    <div class="card-header bg-secondary">
+                        <span class="font-monospace">General Console</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="general-console" name="general-console" class="console-box">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Console -->
+            <div class="col-md-6 col-xl-3">
+                <div class="card border rounded shadow-sm">
+                    <div class="card-header bg-danger text-white">
+                        <span class="font-monospace">Error Console</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="error-console" class="console-box">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skipped Console -->
+            <div class="col-md-6 col-xl-3">
+                <div class="card border rounded shadow-sm">
+                    <div class="card-header bg-warning text-dark">
+                        <span class="font-monospace">Skipped Entries</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="skipped-console" class="console-box">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Changed Console -->
+            <div class="col-md-6 col-xl-3">
+                <div class="card border rounded shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <span class="font-monospace">Updated Entries</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="changed-console" class="console-box">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Step 4: Download Buttons -->
+    <div id="step4" class="d-flex justify-content-center gap-3 mb-4 mt-5 d-none">
+        <a id="downloadJsonBtn" name="downloadJsonBtn" href="#" class="btn btn-info btn-lg px-5">
+            <i class="bi bi-download"></i> Download JSON
+        </a>
+        <a id="downloadSha256Btn" name="downloadSha256Btn" href="#" class="btn btn-info btn-lg px-5">
+            <i class="bi bi-download"></i> Download SHA-256
+        </a>
+    </div>
+
+    <!-- Tutorial Card for Step 3 -->
+    <div id="tutorialStep3" class="card mb-4 rounded shadow-sm d-none cardtut">
+        <div class="card-header bg-dark text-white">
+            <h5>Tutorial: Step 3</h5>
+        </div>
+        <div class="card-body">
+            <p>Monitor the progress of your ruleset generation.</p>
+            <ul>
+                <li>The progress bar will show the percentage of completion.</li>
+                <li>System logs will provide updates on the current process.</li>
+                <li>Download the JSON file and the SHA256 file. Then, upload the JSON and SHA256 files to your web server.</li>
+                <li>When you have downloaded both the JSON file and the SHA256 file, you will see the option to create a new ruleset.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Step 5: Generate New RuleSet Card -->
+    <div id="step5" class="card mb-4 rounded shadow-sm d-none mt-3">
+        <div class="card-header bg-dark text-white">
+            <center>
+                <h5>Do you want to create new ruleset?</h5>
+            </center>
+        </div>
+        <div class="card-body text-center">
+            <button id="generateNewBtn" class="btn btn-success btn-lg px-5">Generate New RuleSet</button>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    $(document).ready(function () {
+        let processId;
+        let jsonBtnClicked = false;
+        let sha256BtnClicked = false;
+        let general = 0;
+        let error = 0;
+        let skipped = 0;
+        let updated = 0;
+
+        // Step 1 Buttons
+        $('#createNewBtn').click(function () {
+            $('#step1').addClass('d-none');
+            $('#step2').removeClass('d-none');
+            showStep('step2', 'tutorialStep2');
+        });
+
+        $('#uploadExistingBtn').click(function () {
+            $('#fileInputWrapper').removeClass('d-none');
+            $('#step1NextBtn').removeClass('disabled');
+        });
+
+        $('#step1NextBtn').click(function () {
+            const jsonFile = $('#jsonFileInputStep1')[0].files[0];
+
+            if ($('#fileInputWrapper').is(':visible') && !jsonFile) {
+                $('#validationMessages').html('<div class="alert alert-danger">Please upload a JSON file.</div>');
+                $('#validationMessages').removeClass('d-none');
+                return;
+            }
+
+            if ($('#fileInputWrapper').is(':visible') && !jsonFile) {
+                showValidationMessage('#validationMessages', 'Please upload a JSON file.');
+                return;
+            }
+
+            if (jsonFile) {
+                const formData = new FormData();
+                formData.append('jsonFileInput', jsonFile);
+
+                $.ajax({
+                    url: '/api/guest/validate_json',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.valid) {
+                            // Populate settings with JSON data
+                            const jsonData = response.data;
+                            $('#ruleName').val(jsonData.rules[0].name);
+                            $('#description').val(jsonData.rules[0].description);
+                            $('#ruleType').val(jsonData.rules[0].type);
+                            $('#spamRating').val(parseFloat(jsonData.rules[0].spamRatingFactor));
+                            $('#fileName').val('custom-ruleset');
+
+                            // Store JSON data in a data attribute
+                            $('#settingsForm').data('jsonData', jsonData);
+
+                            // Check if there are multiple rules
+                            if (response.multipleRules) {
+                                const ruleSelectionWrapper = $('#ruleSelectionWrapper');
+                                const selectedRuleTypeDropdown = $('#selectedRuleType');
+
+                                jsonData.rules.forEach(rule => {
+                                    selectedRuleTypeDropdown.append($('<option>', {
+                                        value: rule.uuid,
+                                        text: rule.name
+                                    }));
+                                });
+
+                                ruleSelectionWrapper.removeClass('d-none');
+                            }
+
+                            $('#step1').addClass('d-none');
+                            $('#step2').removeClass('d-none');
+                            showStep('step2', 'tutorialStep2');
+                        } else {
+                            $('#validationMessages').html('<div class="alert alert-danger">' + response.message + '</div>');
+                            $('#validationMessages').removeClass('d-none');
+                            showValidationMessage('#validationMessages', response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        $('#validationMessages').html('<div class="alert alert-danger">Error validating JSON file.</div>');
+                        $('#validationMessages').removeClass('d-none');
+                        showValidationMessage('#validationMessages', 'Error validating JSON file.');
+                    }
+                });
+            } else {
+                // No JSON file uploaded, proceed to step 2 with default settings
+                $('#step1').addClass('d-none');
+                $('#step2').removeClass('d-none');
+                showStep('step2', 'tutorialStep2');
+            }
+        });
+
+
+        // Step 2 Buttons
+        $('#selectedRuleType').change(function () {
+            const selectedType = $(this).val();
+            const jsonData = $('#settingsForm').data('jsonData');
+
+            // Find the selected rule
+            const selectedRule = jsonData.rules.find(rule => rule.uuid === selectedType);
+            if (selectedRule) {
+                $('#ruleName').val(selectedRule.name);
+                $('#description').val(selectedRule.description);
+                $('#ruleType').val(selectedRule.type);
+                $('#spamRating').val(parseFloat(selectedRule.spamRatingFactor));
+            }
+        });
+
+
+        $('#step2BackBtn').click(function () {
+            showStep('step1', 'tutorialStep1');
+            $('#step2').addClass('d-none');
+            $('#step1').removeClass('d-none');
+            // Clear rule selection dropdown if it was visible
+            $('#ruleSelectionWrapper').addClass('d-none');
+            $('#selectedRuleType').empty();
+            $('#selectedRuleType').append($('<option>', {
+                value: '',
+                text: 'Select rule type...',
+                disabled: true,
+                selected: true
+            }));
+        });
+
+        $('#step2NextBtn').click(function () {
+            // Validate form fields
+            let hasError = false;
+            const validationMessages = [];
+        
+            if (!$('#ruleName').val()) {
+                validationMessages.push('Rule Name is required.');
+                hasError = true;
+            }
+        
+            if (!$('#description').val()) {
+                validationMessages.push('Rule Description is required.');
+                hasError = true;
+            }
+        
+            if (!$('#ruleType').val() || $('#ruleType option:selected').is(':disabled')) {
+                validationMessages.push('Please select a valid Rule Type.');
+                hasError = true;
+            }
+        
+            if (!$('#spamRating').val()) {
+                validationMessages.push('Rule Default Spam Rating is required.');
+                hasError = true;
+            } else if (isNaN($('#spamRating').val())) {
+                validationMessages.push('Rule Default Spam Rating must be a number.');
+                hasError = true;
+            }
+        
+            if (!$('#fileName').val()) {
+                validationMessages.push('Rule Export File Name is required.');
+                hasError = true;
+            }
+        
+            const fileInput = $('#fileInput')[0].files[0];
+            if (!fileInput) {
+                validationMessages.push('Please upload a .txt file.');
+                hasError = true;
+            } else if (fileInput.type !== 'text/plain' && fileInput.name.split('.').pop().toLowerCase() !== 'txt') {
+                validationMessages.push('Only .txt files are allowed.');
+                hasError = true;
+            }
+        
+            if (hasError) {
+                $('#validationMessages2').html('<div class="alert alert-danger">Following errors need to be fixed: <br><br> - ' + validationMessages.join('<br>- ') + '</div>');
+                $('#validationMessages2').removeClass('d-none');
+                return;
+            }
+        
+            const formData = new FormData($('#settingsForm')[0]);
+            formData.append('ruleName', $('#ruleName').val());
+            formData.append('description', $('#description').val());
+            formData.append('ruleType', $('#ruleType').val());
+            formData.append('spamRatingFactor', $('#spamRating').val());
+            formData.append('fileName', $('#fileName').val());
+            formData.append('fileInput', $('#fileInput')[0].files[0]);
+        
+            if ($('#jsonFileInputStep1')[0].files.length > 0) {
+                formData.append('jsonFileInput', $('#jsonFileInputStep1')[0].files[0]);
+            }
+        
+            $.ajax({
+                url: '/api/guest/ruleset_generate',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    processId = response.processId;
+                    showStep('step3', 'tutorialStep3');
+                    $('#step2').addClass('d-none');
+                    $('#step3').removeClass('d-none');
+                    startProgressStream(processId);
+                },
+                error: function (xhr, status, error) {
+                    var result = JSON.parse(xhr.responseText);
+                    showValidationMessage('#validationMessages2', 'Error generating ruleset. More details: ' + result.error);
+                }
+            });
+        });
+        
+
+        // Step 3 Progress Stream
+        function startProgressStream(processId) {
+            const eventSource = new EventSource(`/api/guest/ruleset_progress_stream/${processId}`);
+        
+            eventSource.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+        
+                if (data.progress !== undefined) {
+                    // Update progress bar and status text
+                    $('#progressBar')
+                        .css('width', data.progress + '%')
+                        .attr('aria-valuenow', data.progress)
+                        .text(data.progress + '%');
+        
+                    $('#statusText').removeClass('d-none').text(data.message);
+        
+                    // Show console section
+                    if (data.progress > 0) {
+                        $('#consoleSection').removeClass('d-none');
+                    }
+        
+                    // Show download buttons when progress is complete
+                    if (data.progress === 100) {
+                        $('#downloadJsonBtn').attr('href', `/api/guest/ruleset-download/${processId}/1`).removeClass('d-none');
+                        $('#downloadSha256Btn').attr('href', `/api/guest/ruleset-download/${processId}/2`).removeClass('d-none');
+                        eventSource.close();
+                        $('#step3').addClass('d-none');
+                        $('#step4').removeClass('d-none');
+                    }
+                }
+        
+                // Log message to appropriate console
+                logMessage(data.message, data.isError, data.isSkipped, data.isChanged);
+            };
+        
+            eventSource.addEventListener('error', (event) => {
+                console.error('Custom error message:', event.data);
+                logMessage('Custom error message:', event.data, true);
+            });
+            eventSource.onerror = function (e) {
+                console.error("EventSource failed.");
+                logMessage("EventSource failed: " + e, true);
+                eventSource.close();
+            };
+        }
+        
+
+
+
+        // Handle the keydown event to allow dot without resetting
+        $('#spamRating').on('keydown', function (event) {
+            const keyCode = event.keyCode || event.which;
+            const value = $(this).val();
+
+            // Allow only digits, one dot, backspace, and arrow keys
+            if ((keyCode < 48 || keyCode > 57) && keyCode !== 190 && keyCode !== 8 && keyCode !== 37 && keyCode !== 39) {
+                event.preventDefault();
+            }
+
+            // Prevent multiple dots
+            if (value.includes('.') && keyCode === 190) {
+                event.preventDefault();
+            }
+        });
+
+
+
+        // Generate New RuleSet Button
+        $('#generateNewBtn').click(function () {
+            // Reset form fields and show step 1
+            $('#settingsForm')[0].reset();
+            $('#step4').addClass('d-none');
+            $('#step2').addClass('d-none');
+            $('#step3').addClass('d-none');
+            $('#step5').addClass('d-none');
+            $('#fileInputWrapper').addClass('d-none');
+            $('#validationMessages').addClass('d-none');
+            $('#validationMessages2').addClass('d-none');
+
+            var fileInput = document.getElementById('jsonFileInputStep1');
+            fileInput.value = '';
+            $('#consoleSection').addClass('d-none');
+            $('#downloadJsonBtn').addClass('d-none');
+            $('#downloadSha256Btn').addClass('d-none');
+            $('#progressBar').css('width', '0%').attr('aria-valuenow', 0).text('0%');
+            var generalsetting = document.getElementById('general_logLimit');
+            var errorsetting = document.getElementById('error_logLimit');
+            var skippedsetting = document.getElementById('skipped_logLimit');
+            var updatedsetting = document.getElementById('updated_logLimit');
+            generalsetting.removeAttribute('disabled');
+            errorsetting.removeAttribute('disabled');
+            skippedsetting.removeAttribute('disabled');
+            updatedsetting.removeAttribute('disabled');
+            showStep('step1', 'tutorialStep1');
+        });
+
+        // Log Message Function
+        function logMessage(message, isError = false, isSkipped = false, isChanged = false) {
+            var generalLogLimit = getLogLimitById('general_logLimit');
+            var errorLogLimit = getLogLimitById('error_logLimit');
+            var skippedLogLimit = getLogLimitById('skipped_logLimit');
+            var updatedLogLimit = getLogLimitById('updated_logLimit');
+
+            if (isError) {
+                message = '<span class="error">' + message + '</span>';
+                var errorConsoleDiv = document.getElementById('error-console');
+                errorConsoleDiv.innerHTML += message + '<br>';
+
+                limitLogs(errorConsoleDiv, errorLogLimit);
+
+                errorConsoleDiv.scrollTop = errorConsoleDiv.scrollHeight;
+            } else if (isSkipped) {
+                message = '<span class="skipped">' + message + '</span>';
+                var skippedConsoleDiv = document.getElementById('skipped-console');
+                skippedConsoleDiv.innerHTML += message + '<br>';
+
+                limitLogs(skippedConsoleDiv, skippedLogLimit);
+
+                skippedConsoleDiv.scrollTop = skippedConsoleDiv.scrollHeight;
+            } else if (isChanged) {
+                message = '<span class="changed">' + message + '</span>';
+                var changedConsoleDiv = document.getElementById('changed-console');
+                changedConsoleDiv.innerHTML += message + '<br>';
+
+                limitLogs(changedConsoleDiv, updatedLogLimit);
+
+                changedConsoleDiv.scrollTop = changedConsoleDiv.scrollHeight;
+            } else {
+                // Default to general console if no specific flag is set
+                var consoleDiv = document.getElementById('general-console');
+                message = '<span class="general">' + message + '</span>';
+                consoleDiv.innerHTML += message + '<br>';
+
+                limitLogs(consoleDiv, generalLogLimit);
+
+                consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            }
+        }
+
+        // Function to limit the number of logs in a console
+        function limitLogs(consoleDiv, maxLogs) {
+            const logs = consoleDiv.innerHTML.split('<br>').filter(log => log.trim() !== '');
+        
+            if (logs.length > maxLogs) {
+                consoleDiv.innerHTML = logs.slice(-maxLogs).map(log => log + '<br>').join('');
+            } else {
+                // Ensure each log ends with <br> for proper separation
+                consoleDiv.innerHTML = logs.map(log => log + '<br>').join('');
+            }
+        }
+        
+        
+
+        // Utility Functions
+        function showStep(stepToShowId, tutorialStepId = null) {
+            $('.cardtut').addClass('d-none');
+            $('#' + stepToShowId).removeClass('d-none');
+
+            if (tutorialStepId) {
+                $('.cardtut.tutorial-step').addClass('d-none');
+                $('#' + tutorialStepId).removeClass('d-none');
+            }
+
+            // Reset validation messages
+            $('#validationMessages').html('').addClass('d-none');
+        }
+
+        function showValidationMessage(containerId, message) {
+            $(containerId).html('<div class="alert alert-danger">' + message + '</div>');
+            $(containerId).removeClass('d-none');
+        }
+
+        // Download Buttons
+        $('#downloadJsonBtn').click(function () {
+            jsonBtnClicked = true;
+            checkBothButtons();
+        });
+
+        // Download Buttons
+        $('#downloadSha256Btn').click(function () {
+            sha256BtnClicked = true;
+            checkBothButtons();
+        });
+
+        function checkBothButtons() {
+            if (jsonBtnClicked && sha256BtnClicked) {
+                jsonBtnClicked = false;
+                sha256BtnClicked = false
+                $('#step5').removeClass('d-none');
+            }
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        function toggleInput(checkbox, inputId) {
+            var input = document.getElementById(inputId);
+            if (checkbox.checked) {
+                input.setAttribute('disabled', 'true');
+                input.value = '';
+                input.placeholder = 'Unlimited logs';
+            } else {
+                input.removeAttribute('disabled');
+                input.value = '15';
+                input.placeholder = 'Enter log limit';
+            }
+        }
+
+        // Expose the function to the global scope
+        window.toggleInput = toggleInput;
+
+        function getLogLimitById(id) {
+            var input = document.getElementById(id);
+            var checkbox = document.querySelector('input[data-target="' + id + '"]');
+            if (checkbox && checkbox.checked) {
+                return 'Unlimited';
+            } else {
+                return input.value;
+            }
+        }
+
+        window.getLogLimitById = getLogLimitById;
+    });
+</script>
+{% endblock %}

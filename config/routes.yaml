@@ -1,0 +1,11 @@
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute
+
+api_guest_ruleset_generation:
+    # New, unique route name
+    path: /api/guest/ruleset_generation # Adjusted path (or keep /api/guest/ruleset_generation if you prefer, but make sure it's unique)
+    controller: App\Controller\ApiController::rulesetGeneration # Correct controller and action
+    methods: [ POST, 'GET' ]

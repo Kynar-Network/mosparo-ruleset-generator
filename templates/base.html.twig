@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token(get_env('APP_CSRF_PAGE')) }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Welcome!{% endblock %}</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+    <style>
+        .console-box {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .console-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .card-header span {
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .console-box {
+                height: 150px;
+            }
+
+            .col-md-6,
+            .col-xl-3 {
+                flex: 0 0 100%;
+            }
+        }
+
+        /* Fix theme switcher button */
+        #themeSwitcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 10px !important;
+        }
+
+        .theme-switcher {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card,
+        .console-box {
+            transition: background-color 0.3s ease;
+        }
+
+        body {
+            transition: background-color 0.3s ease;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .skipped {
+            color: #add8e6;
+            /* light blue */
+        }
+
+        .changed {
+            color: #d2b48c;
+            /* light brown */
+        }
+
+        [data-bs-theme=light] .general {
+            color: var(--bs-primary-text-emphasis);
+        }
+    </style>
+
+    {% block stylesheets %}
+    {% endblock %}
+</head>
+
+<body>
+    {% block body %}{% endblock %}
+
+    <div class="d-flex justify-content-center">
+        <a href="https://www.buymeacoffee.com/kynarnetwork"><img src="https://img.buymeacoffee.com/button-api/?text=Support Now&emoji=&slug=kynarnetwork&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" /></a>
+    </div>
+    <!-- Theme Switcher Button -->
+    <button type="button" id="themeSwitcher" class="btn btn-sm rounded-circle shadow" onclick="toggleTheme()">
+        <i class="bi bi-moon-fill"></i> <!-- Moon icon for dark mode -->
+    </button>
+    <!-- Footer -->
+    <footer class="footer mt-5 py-3 bg-light">
+        <div class="container text-center">
+            <p class="mb-0">Created by <a href="https://github.com/StrangerGithuber"
+                    target="_blank">StrangerGithuber</a> for <a href="https://mosparo.io/" target="_blank">mosparo</a>
+            </p>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/js/lib_custom.js"></script>
+
+
+    <script>
+        // Dark mode toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+                document.getElementById('themeSwitcher').innerHTML = '<i class="bi bi-moon-fill"></i>';
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                document.getElementById('themeSwitcher').innerHTML = '<i class="bi bi-sun-fill"></i>';
+            }
+        }
+        $(document).ready(function () {
+            $('#themeSwitcher').click(function () {
+                const html = document.documentElement;
+                if (html.classList.contains('dark-mode')) {
+                    html.classList.remove('dark-mode');
+                    document.documentElement.setAttribute('data-bs-theme', 'light')
+                    localStorage.setItem('theme', 'light');
+                    this.innerHTML = '<i class="bi bi-moon-fill"></i>';
+                } else {
+                    html.classList.add('dark-mode');
+                    document.documentElement.setAttribute('data-bs-theme', 'dark')
+                    localStorage.setItem('theme', 'dark');
+                    this.innerHTML = '<i class="bi bi-sun-fill"></i>';
+                }
+            });
+        });
+
+        // Check for saved theme preference on page load
+        window.addEventListener('DOMContentLoaded', function () {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const html = document.documentElement;
+            if (savedTheme === 'dark') {
+                html.classList.add('dark-mode');
+                document.getElementById('themeSwitcher').innerHTML = '<i class="bi bi-sun-fill"></i>';
+            } else {
+                html.classList.remove('dark-mode');
+                document.getElementById('themeSwitcher').innerHTML = '<i class="bi bi-moon-fill"></i>';
+            }
+        });
+
+    </script>
+    {% block javascripts %}
+    {% endblock %}
+</body>
+
+</html>
