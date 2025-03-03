@@ -29,7 +29,7 @@ The primary goal of the **Mosparo Ruleset Generator** is to democratize ruleset 
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/StrangerGithuber/mosparo-ruleset-generator.git
+   git clone https://github.com/Kynar-Network/mosparo-ruleset-generator.git
    cd mosparo-ruleset-generator
    ```
 
