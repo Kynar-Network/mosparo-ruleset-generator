@@ -217,7 +217,7 @@
         <div class="row g-4">
 
             <!-- General Console -->
-            <div class="col-md-6 col-xl-3">
+            <div class="col-md-6 col-xl-3" id="generalConsoleSection">
                 <div class="card border rounded shadow-sm text-white">
                     <div class="card-header bg-secondary">
                         <span class="font-monospace">General Console</span>
@@ -230,7 +230,7 @@
             </div>
 
             <!-- Error Console -->
-            <div class="col-md-6 col-xl-3">
+            <div class="col-md-6 col-xl-3" id="errorConsoleSection">
                 <div class="card border rounded shadow-sm">
                     <div class="card-header bg-danger text-white">
                         <span class="font-monospace">Error Console</span>
@@ -243,7 +243,7 @@
             </div>
 
             <!-- Skipped Console -->
-            <div class="col-md-6 col-xl-3">
+            <div class="col-md-6 col-xl-3" id="skippedConsoleSection">
                 <div class="card border rounded shadow-sm">
                     <div class="card-header bg-warning text-dark">
                         <span class="font-monospace">Skipped Entries</span>
@@ -256,7 +256,7 @@
             </div>
 
             <!-- Changed Console -->
-            <div class="col-md-6 col-xl-3">
+            <div class="col-md-6 col-xl-3" id="changedConsoleSection">
                 <div class="card border rounded shadow-sm">
                     <div class="card-header bg-success text-white">
                         <span class="font-monospace">Updated Entries</span>
@@ -322,17 +322,20 @@
         let error = 0;
         let skipped = 0;
         let updated = 0;
+        let isUpdatingExistingFile = false; // Track whether an existing file is being updated
 
         // Step 1 Buttons
         $('#createNewBtn').click(function () {
             $('#step1').addClass('d-none');
             $('#step2').removeClass('d-none');
+            isUpdatingExistingFile = false; // Set to false when creating new JSON file
             showStep('step2', 'tutorialStep2');
         });
 
         $('#uploadExistingBtn').click(function () {
             $('#fileInputWrapper').removeClass('d-none');
             $('#step1NextBtn').removeClass('disabled');
+            isUpdatingExistingFile = true; // Set to true when uploading an existing JSON file
         });
 
         $('#step1NextBtn').click(function () {
@@ -542,6 +545,25 @@
                     // Show console section
                     if (data.progress > 0) {
                         $('#consoleSection').removeClass('d-none');
+
+                        // Conditionally show consoles based on scenario
+                    if (!isUpdatingExistingFile) {
+                        // Only show General and Error Console
+                        console.log('Just general and error: ' + isUpdatingExistingFile);
+                        $('#generalConsoleSection').removeClass('col-md-6 col-xl-3').addClass('col-md-6');
+                        $('#errorConsoleSection').removeClass('col-md-6 col-xl-3').addClass('col-md-6');
+                        
+                        $('#skippedConsoleSection').addClass('d-none');
+                        $('#changedConsoleSection').addClass('d-none');
+                    } else {
+                        // Show all consoles
+                        console.log('Everything: ' + isUpdatingExistingFile);
+                        $('#generalConsoleSection').removeClass('col-md-6 col-xl-3').addClass('col-md-6 col-xl-3');
+                        $('#errorConsoleSection').removeClass('col-md-6 col-xl-3').addClass('col-md-6 col-xl-3');
+                        
+                        $('#skippedConsoleSection').removeClass('d-none');
+                        $('#changedConsoleSection').removeClass('d-none');
+                    }
                     }
         
                     // Show download buttons when progress is complete
@@ -616,6 +638,11 @@
             errorsetting.removeAttribute('disabled');
             skippedsetting.removeAttribute('disabled');
             updatedsetting.removeAttribute('disabled');
+            $('#generalConsoleSection').removeClass('col-md-6 col-xl-3').addClass('col-md-6 col-xl-3');
+            $('#errorConsoleSection').removeClass('col-md-6 col-xl-3').addClass('col-md-6 col-xl-3');
+            $('#skippedConsoleSection').removeClass('col-md-6 col-xl-3').addClass('col-md-6 col-xl-3');
+            $('#changedConsoleSection').removeClass('col-md-6 col-xl-3').addClass('col-md-6 col-xl-3');
+            isUpdatingExistingFile = false; // Set to false when creating new JSON file
             showStep('step1', 'tutorialStep1');
         });
 
