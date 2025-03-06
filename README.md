@@ -1,16 +1,16 @@
-# Mosparo Ruleset Generator
+# mosparo Ruleset Generator
 
 ---
 
 ## Introduction
 
-Welcome to the **Mosparo Ruleset Generator**! This project is a tool designed to simplify the creation and management of rulesets for the [Mosparo spam protection tool](https://mosparo.io/) and its [Github](https://github.com/mosparo/mosparo). Whether you're a developer, website administrator, or security enthusiast, this generator provides an intuitive interface to streamline the process of setting up and updating rulesets for enhanced form protection.
+Welcome to the **mosparo Ruleset Generator**! This project is a tool designed to simplify the creation and management of rulesets for the [mosparo spam protection tool](https://mosparo.io/) and its [Github](https://github.com/mosparo/mosparo). Whether you're a developer, website administrator, or security enthusiast, this generator provides an intuitive interface to streamline the process of setting up and updating rulesets for enhanced form protection.
 
 ---
 
 ## Why the Project is Made
 
-The primary goal of the **Mosparo Ruleset Generator** is to democratize ruleset creation for Mosparo. Traditionally, creating a comprehensive set of rules for spam protection tool can be time-consuming and technically challenging. This project aims to make that process more accessible by providing an easy-to-use web interface.
+The primary goal of the **mosparo Ruleset Generator** is to democratize ruleset creation for mosparo. Traditionally, creating a comprehensive set of rules for spam protection tool can be time-consuming and technically challenging. This project aims to make that process more accessible by providing an easy-to-use web interface.
 
 1. **Simplification**: Streamline the creation of complex rulesets with just a few clicks.
 2. **User-Friendly Interface**: Intuitive design makes it accessible for users without extensive technical knowledge.
@@ -70,7 +70,7 @@ The primary goal of the **Mosparo Ruleset Generator** is to democratize ruleset 
    Click "Next" to start the generation process. You'll see real-time progress updates and system logs in different consoles.
 
 5. **Download Generated Files**:
-   Once the process is complete, download the generated JSON file and its SHA-256 hash for use with Mosparo.
+   Once the process is complete, download the generated JSON file and its SHA-256 hash for use with mosparo.
 
 
 ### TXT File Upload Support
@@ -131,7 +131,7 @@ To automatically delete temporary files from previous days, set up a cron job:
 
 ## License
 
-The **Mosparo Ruleset Generator** is free to use and modify under the terms of its [LICENSE](./LICENSE). Here are some key points:
+The **mosparo Ruleset Generator** is free to use and modify under the terms of its [LICENSE](./LICENSE). Here are some key points:
 
 1. **Free Usage**: You are welcome to use this project for any purpose.
 2. **No Commercial Sale**: It is strictly forbidden to sell or monetize this code in any way.
@@ -154,7 +154,7 @@ If you find my work helpful, please consider supporting me:
 
 # Final Thoughts
 
-Thank you for choosing the **Mosparo Ruleset Generator** for your needs! This project is a collaborative effort aimed at making form protection more accessible and efficient. We hope it serves as a valuable tool in your arsenal against spam and automated attacks.
+Thank you for choosing the **mosparo Ruleset Generator** for your needs! This project is a collaborative effort aimed at making form protection more accessible and efficient. We hope it serves as a valuable tool in your arsenal against spam and automated attacks.
 
 1. **User Support**: Feel free to reach out with any questions or feedback.
 2. **Community Engagement**: Join our community to share ideas, report issues, and contribute improvements.
